@@ -1,0 +1,38 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+from scipy.signal import find_peaks
+
+class Peaks:
+    
+    def __init__(self, filename, distance):
+        
+        self._data = pd.read_csv(filename, sep='\t', header=1)
+        self._distance = distance
+        
+        self.w = -self._data.W
+        self.nm = self._data.nm
+        self.peaks = self.find_peaks()
+        
+    def find_peaks(self):
+       
+        self.peaks, _ = find_peaks(self.w, distance=self._distance)
+        return self.peaks
+        
+    def plot(self):
+       
+        
+        plt.figure(figsize=(12, 8))
+        plt.plot(-self.w)
+        plt.plot(-self.w[self.peaks], 'ro')
+        
+    def get_results(self):
+        minimums = -self.w[self.peaks].values
+        minimums_nm = self.nm[self.peaks].values
+        deltas = minimums_nm[1:] - minimums_nm[:1]
+        
+        return {'minimums': minimums, 'deltas': deltas, 'indices': self.peaks}
+
+peaks = Peaks(filename='C:/Users/user/Desktop/проект/T_5.txt', distance=30000)
+results = peaks.get_results()
+print(results['minimums'])
+peaks.plot()
